@@ -16,10 +16,10 @@ const getDefaults = options => {
     // new defaults
     const setting = {
         imports: runtimePath,
+        esModules: true,
         bail: true,
         cache: false,
         debug: false,
-
         sourceMap: false,
         sourceRoot: options.sourceRoot
     };
@@ -242,16 +242,26 @@ const precompile = (options = {}) => {
     }
 
     code = code.replace(/^\(|\)[;\s]*?$/g, '');
-    code =
-        'var ' +
-        CONSTS.IMPORTS +
-        ' = require(' +
-        JSON.stringify(tplImportsPath) +
-        ');\n' +
-        'module.exports = ' +
-        code +
-        ';';
-
+    if (options.esModules) {
+        code =
+            'import ' +
+            CONSTS.IMPORTS +
+            ' from ' +
+            JSON.stringify(tplImportsPath) +
+            ';\nexport default ' +
+            code +
+            ';';
+    } else {
+        code =
+            'var ' +
+            CONSTS.IMPORTS +
+            ' = require(' +
+            JSON.stringify(tplImportsPath) +
+            ');\n' +
+            'module.exports = ' +
+            code +
+            ';';
+    }
     return {
         code,
         ast,
